@@ -76,3 +76,46 @@ CovalentHQ API (with retry + caching)
 Service Filters Result (Type & Non-zero Balance)
         ↓
 Handler Sends Final JSON Response to Client
+```
+
+## ✅ 4. Architecture Diagram
+```mermaid
+flowchart TD
+    subgraph Client Layer
+        A[User/API Client]
+    end
+
+    subgraph Server Layer
+        B[/HTTP Request:\nGET /erc20/address/] --> C[Router routes.go]
+        C --> D[Handler erc20_handler.go]
+        D --> E[EthTokenService\n eth_impl.go]
+    end
+
+    subgraph Service Layer
+        E --> F[Repository Interface\n repo.go]
+        F --> G[CovalentAPI\n utils/covalentApi.go]
+    end
+
+    subgraph Utility Layer
+        G --> H[Build URL + Select API Key]
+        H --> I[Check Redis Cache]
+        I -->|Hit| J[Return Cached Data]
+        I -->|Miss| K[Make HTTP GET Request\n to Covalent HQ]
+        K --> L[Retry + Validate JSON]
+        L --> M[Store in Redis Cache async]
+    end
+
+    subgraph API & Data
+        K --> N[CovalentHQ API]
+    end
+
+    M --> O[Return API Response]
+    J --> O
+    O --> P[Filter Tokens\n Type: crypto/stablecoin, balance > 0]
+    P --> Q[Return Token List]
+    Q --> R[Handler Sends Response JSON]
+    R --> S[Client Receives Tokens]
+    
+    A --> B
+    S --> A
+```
