@@ -119,3 +119,18 @@ flowchart TD
     A --> B
     S --> A
 ```
+---
+
+## 🧱 5. Architectural Benefits
+
+| Feature                  | Benefit                                               |
+|--------------------------|--------------------------------------------------------|
+| **Interface abstraction** | Easily swap or extend token sources (e.g., Alchemy, Moralis) |
+| **Layered separation**    | Decouples logic, improves maintainability & testability |
+| **Redis caching**         | Minimizes redundant API calls, speeds up responses     |
+| **Config-driven setup**   | Enables seamless deployment across environments        |
+| **Middleware-ready routing** | Simplifies integration of CORS, auth, and rate limiting |
+| **Retry + validation logic** | Improves resiliency against flaky or slow API responses |
+
+---
+
