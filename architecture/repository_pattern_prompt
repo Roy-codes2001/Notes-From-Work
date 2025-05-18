@@ -1,0 +1,69 @@
+I’m working on a modular DeFi project in Go, which follows a clean layered architecture and uses the Repository Pattern. The domain includes Ethereum-based protocols, cross-chain swaps, bridging, liquidity routing, and DeFi analytics. Please remember this architecture and apply it whenever writing new code or features.
+
+📁 General Architecture Overview:
+
+1. **Handler Layer (HTTP Layer)**  
+   - Parses HTTP requests and query parameters.  
+   - Performs basic validation.  
+   - Calls methods from the service layer and returns structured JSON responses.
+
+2. **Service Layer (Business Logic)**  
+   - Implements core application logic.  
+   - Coordinates workflows across repositories/utilities.  
+   - Interacts only with interfaces (repository abstractions).  
+   - Responsible for transforming and filtering raw data before responding.
+
+3. **Repository Layer (Interface Definitions)**  
+   - Defines abstract interfaces for interacting with different data sources, protocols, or chains.  
+   - Promotes extensibility to plug in new chains, APIs, or smart contracts.  
+   - Examples:
+     ```go
+     type SwapRepository interface {
+         GetSwapRoutes(input SwapParams) ([]SwapRoute, error)
+     }
+
+     type BridgeRepository interface {
+         EstimateBridgeCost(params BridgeQuoteParams) (BridgeQuote, error)
+     }
+     ```
+
+4. **Implementation Layer (Concrete Repos)**  
+   - Contains protocol-specific or chain-specific implementations (e.g., 1inch, Stargate, Wormhole).  
+   - Implements interfaces from the repository layer.  
+   - Handles raw data fetching, parsing, error handling, caching, and rate limiting.
+
+5. **Factory Layer (Models & DTOs)**  
+   - Defines typed structs for request params, response types, and internal data models.  
+   - Promotes type safety across layers.
+
+6. **Utility Layer (External API / Web3 Calls)**  
+   - Contains shared utilities for:
+     - RPC / REST API calls
+     - Retry mechanisms
+     - Logging and tracing
+     - Redis caching
+     - Ethereum/Web3 interactions via go-ethereum or other SDKs
+
+7. **Server Initialization Layer**  
+   - Wires everything together via dependency injection.  
+   - Initializes configs, services, handlers, and middleware.  
+   - Loads environment-based config via `viper` or similar.
+
+8. **Routing Layer**  
+   - Binds HTTP endpoints to handler methods.  
+   - Supports CORS, logging, rate limiting, etc. via middleware.
+
+🧩 Key Architectural Principles:
+- Handlers and services **must depend only on interfaces**, not concrete implementations.
+- Adding new features (e.g., swap routing, bridging, lending analytics) should follow:
+  - Interface → Implementation → Service → Handler pipeline.
+- Cleanly separate concerns for scalability, testability, and future expansion.
+
+🧱 Example Use Case:
+If I request an endpoint like `/swap/route`, use:
+- `SwapRepository` interface
+- `oneInch_impl.go` or `uniswap_impl.go` as implementations
+- Service logic to select and validate routes
+- Handler to expose the result via REST
+
+Let me know when you're ready. I’ll give you the next DeFi functionality to implement.
