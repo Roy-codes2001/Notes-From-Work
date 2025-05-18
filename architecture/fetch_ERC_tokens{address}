@@ -1,1 +1,58 @@
+I’m working on a Go project that fetches ERC-20 tokens for an Ethereum address using Covalent API. The project follows a clean, layered architecture with the Repository Pattern. Please remember this structure and use it when writing or modifying code for this project.
+
+📁 Architecture Overview:
+
+1. **Handler Layer** (e.g., `server/erc20_handler.go`)
+   - Parses and validates HTTP requests.
+   - Calls service methods and returns JSON responses.
+
+2. **Service Layer** (e.g., `pkg/tokenAsset/eth_impl.go`)
+   - Implements the `Repository` interface.
+   - Contains business logic and filtering (e.g., filter stablecoins, non-zero balance).
+
+3. **Interface Layer** (e.g., `pkg/tokenAsset/repo.go`)
+   - Defines `Repository` interface with methods like:
+     ```go
+     type Repository interface {
+         GetERC20Tokens(params ERC20QueryParams) ([]TokenItem, error)
+     }
+     ```
+
+4. **Factory Layer** (e.g., `pkg/factory/tokenAssets.go`)
+   - Defines data types like:
+     ```go
+     type ERC20QueryParams struct {
+         Address string
+     }
+
+     type TokenItem struct {
+         Name     string
+         Symbol   string
+         Balance  string
+         Contract string
+     }
+     ```
+
+5. **Utility Layer** (e.g., `utils/covalentApi.go`)
+   - Encapsulates external API call logic, retry mechanism, caching (Redis), and API key management.
+
+6. **Server Init** (e.g., `server/server.go`)
+   - Initializes repositories and injects them into handlers using the interface.
+
+7. **Routing Layer** (e.g., `server/routes.go`)
+   - Binds endpoints like `/erc20/{address}` to handler functions.
+
+🧩 When adding new features:
+- Define interfaces in `repo.go` or a similar file.
+- Implement them in their own `*_impl.go`.
+- Use handler → service → repository → utility architecture.
+- Ensure the handler and service depend only on interfaces.
+
+⚙️ Example Usage:
+If I ask for a new feature like `/erc721/{address}`, follow the same repository pattern:
+- Add a new interface method `GetERC721Tokens(...)`
+- Implement it in a new file like `nft_impl.go`
+- Add handler, routing, utility as needed.
+
+Let me know when you're ready. I’ll give you the functionality I want next.
 
